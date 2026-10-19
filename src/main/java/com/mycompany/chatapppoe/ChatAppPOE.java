@@ -27,5 +27,5 @@ public class ChatAppPOE {
         String lp = sc.nextLine();
         System.out.println(login.returnLoginStatus(login.loginUser(lu, lp)));
     }
-} 
+}  
   
