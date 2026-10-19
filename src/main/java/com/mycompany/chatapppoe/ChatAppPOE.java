@@ -1,31 +1,57 @@
 package com.mycompany.chatapppoe;
-import java.util.Scanner;
+
+import javax.swing.JOptionPane;
 
 public class ChatAppPOE {
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter First Name: ");
-        String fn = sc.nextLine();
-        System.out.print("Enter Last Name: ");
-        String ln = sc.nextLine();
-        Login login = new Login(fn, ln);
+        Login login = new Login();
+        
+        // Part 1 - Auto register Thobile for proof
+        login.registerUser("Thob_", "Ch@2024!", "+27721234567", "Thobile", "Khanyeza");
+        String loginResult = login.returnLoginStatus("Thob_", "Ch@2024!");
+        System.out.println(loginResult);
+        if(!login.loginUser("Thob_", "Ch@2024!")) return;
 
-        System.out.print("Enter Username (use kyl_1): ");
-        String u = sc.nextLine();
-        System.out.print("Enter Password (use Ch&&sec@ke99): ");
-        String p = sc.nextLine();
-        System.out.print("Enter Cell (use +27838968976): ");
-        String c = sc.nextLine();
+        // Part 2 - Message system
+        int totalMessages = 0;
+        String allMessages = "";
+        String longestMessage = "";
+        
+        String numStr = JOptionPane.showInputDialog("How many messages do you want to send?");
+        if(numStr == null) return;
+        int numMessages = Integer.parseInt(numStr);
 
-        String res = login.registerUser(u, p, c);
-        System.out.println(res);
-        if (!res.contains("successfully")) return;
-
-        System.out.print("LOGIN Username: ");
-        String lu = sc.nextLine();
-        System.out.print("LOGIN Password: ");
-        String lp = sc.nextLine();
-        System.out.println(login.returnLoginStatus(login.loginUser(lu, lp)));
+        for(int i=1; i<=numMessages; i++){
+            String recipient = JOptionPane.showInputDialog("Enter recipient (+27...):");
+            String text = JOptionPane.showInputDialog("Enter message (max 250 chars):");
+            
+            if(text.length() > 250){
+                JOptionPane.showMessageDialog(null, "Please enter a message of less than 250 characters");
+                i--; continue;
+            }
+            
+            Message msg = new Message(recipient, text, i);
+            
+            if(msg.checkRecipientCell() == 0){
+                JOptionPane.showMessageDialog(null, "Cell phone number is incorrectly formatted or does not contain an international code.");
+                i--; continue;
+            }
+            
+            int choice = JOptionPane.showConfirmDialog(null, 
+                "Message ID: " + msg.getMessageID() + "\nHash: " + msg.getHash() + "\n\nSend message?");
+            
+            if(choice == JOptionPane.YES_OPTION){
+                JOptionPane.showMessageDialog(null, "Message successfully sent.");
+                allMessages += "\n" + msg.getHash() + " - " + msg.getRecipient() + ": " + msg.getMessage();
+                totalMessages++;
+                if(text.length() > longestMessage.length()) longestMessage = text;
+            } else if(choice == JOptionPane.NO_OPTION){
+                JOptionPane.showMessageDialog(null, "Press 0 to delete message.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Message stored to send later.");
+            }
+        }
+        
+        JOptionPane.showMessageDialog(null, "Total messages sent: " + totalMessages + "\nAll messages:\n" + allMessages);
     }
-}   
-  
+}
